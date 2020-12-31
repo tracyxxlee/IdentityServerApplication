@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServerApplication.Helpers;
 
 namespace IdentityServerApplication
 {
@@ -31,9 +33,17 @@ namespace IdentityServerApplication
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                    .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            // set login as default page
+            services.AddMvc()
+                    // 加入 razor page，並設定預設路徑
+                    .AddRazorPagesOptions(options => options.Conventions.AddAreaPageRoute("Identity", "/Account/Login", ""))
+                    .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
+            services.SetIdentityServer();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
